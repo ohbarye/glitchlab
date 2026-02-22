@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GLITCHLAB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1 class="glitch-title" data-text="GLITCHLAB">GLITCHLAB</h1>
+    <p class="subtitle">Image Glitch Processor</p>
+  </header>
+
+  <main class="workspace">
+    <section class="preview-area">
+      <div class="drop-zone" id="dropZone">
+        <div class="drop-zone-content">
+          <p class="drop-icon">+</p>
+          <p class="drop-text">Drop image here</p>
+          <p class="drop-subtext">or click to select</p>
+        </div>
+        <input type="file" accept="image/*" id="fileInput">
+      </div>
+      <div class="canvas-container" id="canvasContainer" hidden>
+        <canvas id="sourceCanvas"></canvas>
+        <canvas id="outputCanvas"></canvas>
+        <canvas id="maskOverlayCanvas"></canvas>
+      </div>
+      <div class="selection-toolbar" id="selectionToolbar" hidden>
+        <button class="sel-btn" id="selToolRect" title="Rectangle select">&#9634;</button>
+        <button class="sel-btn" id="selToolBrush" title="Brush select">&#9679;</button>
+        <button class="sel-btn" id="selToolClear" title="Select all (clear)">&#8634;</button>
+        <button class="sel-btn" id="selToolInvert" title="Invert selection">&#8693;</button>
+        <div class="brush-size-control" id="brushSizeControl" hidden>
+          <span class="brush-size-label">Size</span>
+          <input type="range" id="brushSizeSlider" min="2" max="80" value="20" step="1">
+        </div>
+      </div>
+    </section>
+
+    <aside class="controls-panel" id="controlsPanel">
+      <h2 class="controls-title">EFFECTS</h2>
+      <div id="effectControls"></div>
+      <div class="action-buttons">
+        <button class="btn btn-change" id="changeImageBtn" disabled>CHANGE IMAGE</button>
+        <input type="file" accept="image/*" id="fileInputAlt" class="hidden-file-input">
+        <button class="btn btn-randomize" id="randomizeBtn" disabled>RANDOMIZE ALL</button>
+        <button class="btn btn-reset" id="resetBtn" disabled>RESET ALL</button>
+        <button class="btn btn-copy-png" id="copyPngBtn" disabled>COPY PNG</button>
+        <button class="btn btn-copy-svg" id="copySvgBtn" disabled>COPY SVG</button>
+      </div>
+    </aside>
+  </main>
+
+  <div class="modal-overlay" id="imageModal" hidden>
+    <img id="modalImage" class="modal-image" alt="Zoomed glitch output">
+  </div>
+
+  <div class="crt-overlay"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
