@@ -2,7 +2,7 @@
 
 Image glitch effect processor. Apply digital distortion effects to any image — partially or fully — and copy the result to clipboard.
 
-**Live demo**: https://glitchlab-aqn.pages.dev/
+**Live demo**: https://glitchlab.ohbarye.workers.dev/
 
 ![Demo](docs/demo.gif)
 
@@ -38,21 +38,22 @@ Image glitch effect processor. Apply digital distortion effects to any image —
 ## Development
 
 ```bash
-npx serve .
+npm install
+npm run dev        # Vite dev server with HMR
+npm run build      # tsc -b && vite build
+npm run lint       # ESLint
 ```
-
-No build step required — pure vanilla JS with ES modules.
 
 ## Deploy
 
 ```bash
-npx wrangler pages deploy . --project-name glitchlab
+npm run deploy     # Build + wrangler deploy
 ```
 
 ## Tech
 
-- Vanilla JavaScript (ES modules, no framework)
+- TypeScript + Vite
 - Canvas 2D API for pixel manipulation
 - Clipboard API for copy
 - Pointer Events for touch support
-- Cloudflare Pages for hosting
+- Cloudflare Workers for hosting
