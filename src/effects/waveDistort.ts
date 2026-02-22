@@ -1,3 +1,5 @@
+import type { EffectModule } from "../types";
+
 export default {
   name: "Wave Distort",
   id: "waveDistort",
@@ -9,7 +11,9 @@ export default {
   apply(imageData, params) {
     const { width, height, data } = imageData;
     const src = new Uint8ClampedArray(data);
-    const { amplitude, frequency, phase } = params;
+    const amplitude = params.amplitude as number;
+    const frequency = params.frequency as number;
+    const phase = params.phase as number;
 
     for (let y = 0; y < height; y++) {
       const offset = Math.round(amplitude * Math.sin(frequency * y + phase));
@@ -25,4 +29,4 @@ export default {
     }
     return imageData;
   },
-};
+} satisfies EffectModule;

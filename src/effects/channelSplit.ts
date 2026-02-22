@@ -1,3 +1,5 @@
+import type { EffectModule } from "../types";
+
 export default {
   name: "Channel Split",
   id: "channelSplit",
@@ -9,15 +11,24 @@ export default {
   ],
   apply(imageData, params) {
     const { data } = imageData;
-    const { red, green, blue, swap } = params;
+    const red = params.red as boolean;
+    const green = params.green as boolean;
+    const blue = params.blue as boolean;
+    const swap = params.swap as string;
     const len = data.length;
 
     for (let i = 0; i < len; i += 4) {
-      let r = data[i], g = data[i + 1], b = data[i + 2];
+      let r = data[i],
+        g = data[i + 1],
+        b = data[i + 2];
 
-      if (swap === "RG") { [r, g] = [g, r]; }
-      else if (swap === "RB") { [r, b] = [b, r]; }
-      else if (swap === "GB") { [g, b] = [b, g]; }
+      if (swap === "RG") {
+        [r, g] = [g, r];
+      } else if (swap === "RB") {
+        [r, b] = [b, r];
+      } else if (swap === "GB") {
+        [g, b] = [b, g];
+      }
 
       data[i] = red ? r : 0;
       data[i + 1] = green ? g : 0;
@@ -25,4 +36,4 @@ export default {
     }
     return imageData;
   },
-};
+} satisfies EffectModule;

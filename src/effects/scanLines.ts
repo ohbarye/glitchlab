@@ -1,3 +1,5 @@
+import type { EffectModule } from "../types";
+
 export default {
   name: "Scan Lines",
   id: "scanLines",
@@ -8,12 +10,14 @@ export default {
   ],
   apply(imageData, params) {
     const { width, height, data } = imageData;
-    const { lineWidth, spacing, opacity } = params;
+    const lineWidth = params.lineWidth as number;
+    const spacing = params.spacing as number;
+    const opacity = params.opacity as number;
     const period = lineWidth + spacing;
     const factor = 1 - opacity;
 
     for (let y = 0; y < height; y++) {
-      if ((y % period) < lineWidth) {
+      if (y % period < lineWidth) {
         const rowStart = y * width * 4;
         for (let x = 0; x < width; x++) {
           const i = rowStart + x * 4;
@@ -25,4 +29,4 @@ export default {
     }
     return imageData;
   },
-};
+} satisfies EffectModule;

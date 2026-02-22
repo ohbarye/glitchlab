@@ -1,22 +1,31 @@
+import type { MaskMode } from "./types";
+
 export class MaskManager {
-  constructor(canvasContainer, outputCanvas) {
+  private container: HTMLElement;
+  private outputCanvas: HTMLCanvasElement;
+  private overlayCanvas: HTMLCanvasElement;
+  private overlayCtx: CanvasRenderingContext2D;
+  private maskData: Uint8Array | null = null;
+  private width = 0;
+  private height = 0;
+  private mode: MaskMode = "none";
+  private brushSize = 20;
+  onChange: (() => void) | null = null;
+  private _painting = false;
+  private _rectStart: { x: number; y: number } | null = null;
+  private _maskActiveCache: boolean | null = null;
+
+  constructor(canvasContainer: HTMLElement, outputCanvas: HTMLCanvasElement) {
     this.container = canvasContainer;
     this.outputCanvas = outputCanvas;
-    this.overlayCanvas = document.getElementById("maskOverlayCanvas");
-    this.overlayCtx = this.overlayCanvas.getContext("2d");
-    this.maskData = null;
-    this.width = 0;
-    this.height = 0;
-    this.mode = "none";
-    this.brushSize = 20;
-    this.onChange = null;
-    this._painting = false;
-    this._rectStart = null;
-    this._maskActiveCache = null;
+    this.overlayCanvas = document.getElementById(
+      "maskOverlayCanvas",
+    ) as HTMLCanvasElement;
+    this.overlayCtx = this.overlayCanvas.getContext("2d")!;
     this._attachEvents();
   }
 
-  resize(width, height) {
+  resize(width: number, height: number): void {
     this.width = width;
     this.height = height;
     this.overlayCanvas.width = width;
@@ -26,16 +35,16 @@ export class MaskManager {
     requestAnimationFrame(() => this.syncOverlayPosition());
   }
 
-  syncOverlayPosition() {
+  syncOverlayPosition(): void {
     const rect = this.outputCanvas.getBoundingClientRect();
     const containerRect = this.container.getBoundingClientRect();
-    this.overlayCanvas.style.left = (rect.left - containerRect.left) + "px";
-    this.overlayCanvas.style.top = (rect.top - containerRect.top) + "px";
+    this.overlayCanvas.style.left = rect.left - containerRect.left + "px";
+    this.overlayCanvas.style.top = rect.top - containerRect.top + "px";
     this.overlayCanvas.style.width = rect.width + "px";
     this.overlayCanvas.style.height = rect.height + "px";
   }
 
-  isMaskActive() {
+  isMaskActive(): boolean {
     if (!this.maskData) return false;
     if (this._maskActiveCache !== null) return this._maskActiveCache;
     for (let i = 0; i < this.maskData.length; i++) {
@@ -48,23 +57,23 @@ export class MaskManager {
     return false;
   }
 
-  getMaskData() {
+  getMaskData(): Uint8Array | null {
     return this.maskData;
   }
 
-  selectAll() {
+  selectAll(): void {
     if (this.maskData) this.maskData.fill(255);
     this._maskActiveCache = false;
     this.renderOverlay();
   }
 
-  clearMask() {
+  clearMask(): void {
     if (this.maskData) this.maskData.fill(0);
     this._maskActiveCache = true;
     this.renderOverlay();
   }
 
-  invertMask() {
+  invertMask(): void {
     if (!this.maskData) return;
     for (let i = 0; i < this.maskData.length; i++) {
       this.maskData[i] = this.maskData[i] === 255 ? 0 : 255;
@@ -74,17 +83,19 @@ export class MaskManager {
     if (this.onChange) this.onChange();
   }
 
-  setMode(mode) {
+  setMode(mode: MaskMode): void {
     this.mode = mode;
-    this.overlayCanvas.style.pointerEvents = mode === "none" ? "none" : "auto";
-    this.overlayCanvas.style.cursor = mode !== "none" ? "crosshair" : "default";
+    this.overlayCanvas.style.pointerEvents =
+      mode === "none" ? "none" : "auto";
+    this.overlayCanvas.style.cursor =
+      mode !== "none" ? "crosshair" : "default";
   }
 
-  setBrushSize(size) {
+  setBrushSize(size: number): void {
     this.brushSize = size;
   }
 
-  renderOverlay() {
+  renderOverlay(): void {
     const ctx = this.overlayCtx;
     const { width, height } = this;
     ctx.clearRect(0, 0, width, height);
@@ -104,17 +115,26 @@ export class MaskManager {
     ctx.putImageData(imgData, 0, 0);
   }
 
-  _toImageCoords(e) {
+  private _toImageCoords(e: PointerEvent): { x: number; y: number } {
     const rect = this.overlayCanvas.getBoundingClientRect();
     const scaleX = this.overlayCanvas.width / rect.width;
     const scaleY = this.overlayCanvas.height / rect.height;
     return {
-      x: Math.max(0, Math.min(this.width - 1, Math.floor((e.clientX - rect.left) * scaleX))),
-      y: Math.max(0, Math.min(this.height - 1, Math.floor((e.clientY - rect.top) * scaleY))),
+      x: Math.max(
+        0,
+        Math.min(this.width - 1, Math.floor((e.clientX - rect.left) * scaleX)),
+      ),
+      y: Math.max(
+        0,
+        Math.min(
+          this.height - 1,
+          Math.floor((e.clientY - rect.top) * scaleY),
+        ),
+      ),
     };
   }
 
-  _paintCircle(cx, cy) {
+  private _paintCircle(cx: number, cy: number): void {
     const r = Math.floor(this.brushSize / 2);
     const r2 = r * r;
     const x0 = Math.max(0, cx - r);
@@ -123,29 +143,35 @@ export class MaskManager {
     const y1 = Math.min(this.height - 1, cy + r);
     for (let y = y0; y <= y1; y++) {
       for (let x = x0; x <= x1; x++) {
-        const dx = x - cx, dy = y - cy;
+        const dx = x - cx,
+          dy = y - cy;
         if (dx * dx + dy * dy <= r2) {
-          this.maskData[y * this.width + x] = 255;
+          this.maskData![y * this.width + x] = 255;
         }
       }
     }
     this._maskActiveCache = null;
   }
 
-  _fillRect(x0, y0, x1, y1) {
+  private _fillRect(x0: number, y0: number, x1: number, y1: number): void {
     const minX = Math.max(0, Math.min(x0, x1));
     const maxX = Math.min(this.width - 1, Math.max(x0, x1));
     const minY = Math.max(0, Math.min(y0, y1));
     const maxY = Math.min(this.height - 1, Math.max(y0, y1));
     for (let y = minY; y <= maxY; y++) {
       for (let x = minX; x <= maxX; x++) {
-        this.maskData[y * this.width + x] = 255;
+        this.maskData![y * this.width + x] = 255;
       }
     }
     this._maskActiveCache = null;
   }
 
-  _renderRectPreview(x0, y0, x1, y1) {
+  private _renderRectPreview(
+    x0: number,
+    y0: number,
+    x1: number,
+    y1: number,
+  ): void {
     this.renderOverlay();
     const ctx = this.overlayCtx;
     const rect = this.overlayCanvas.getBoundingClientRect();
@@ -153,13 +179,15 @@ export class MaskManager {
     ctx.strokeStyle = "rgba(0, 255, 245, 0.8)";
     ctx.lineWidth = Math.max(1, 2 * scale);
     ctx.setLineDash([6 * scale, 4 * scale]);
-    const rx = Math.min(x0, x1), ry = Math.min(y0, y1);
-    const rw = Math.abs(x1 - x0), rh = Math.abs(y1 - y0);
+    const rx = Math.min(x0, x1),
+      ry = Math.min(y0, y1);
+    const rw = Math.abs(x1 - x0),
+      rh = Math.abs(y1 - y0);
     ctx.strokeRect(rx, ry, rw, rh);
     ctx.setLineDash([]);
   }
 
-  _attachEvents() {
+  private _attachEvents(): void {
     this.overlayCanvas.addEventListener("pointerdown", (e) => {
       if (this.mode === "brush") {
         this._painting = true;
@@ -192,7 +220,7 @@ export class MaskManager {
       }
     });
 
-    const endHandler = (e) => {
+    const endHandler = (e: PointerEvent) => {
       if (this.mode === "brush") {
         this._painting = false;
       } else if (this.mode === "rect" && this._rectStart) {

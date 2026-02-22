@@ -4,39 +4,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-GLITCHLAB — a static web app for applying glitch effects to images. Pure vanilla JS (ES modules), no build tools or bundler.
+GLITCHLAB — a static web app for applying glitch effects to images. TypeScript + Vite, deployed to Cloudflare Pages.
 
 ## Development
 
 ```bash
-# Serve locally (ES modules require HTTP server)
-npx serve . -l 8080
-
-# Deploy to Cloudflare Pages
-npx wrangler pages deploy . --project-name glitchlab
+npm install          # Install dependencies
+npm run dev          # Vite dev server with HMR
+npm run build        # tsc -b && vite build → dist/
+npm run lint         # ESLint
+npm run preview      # Preview production build
+npm run deploy       # Build + deploy to Cloudflare Pages
 ```
-
-No package.json, no tests, no linter. The app runs directly in the browser.
 
 ## Architecture
 
 ```
-index.html          → Entry point, loads app.js as module
-js/app.js           → Orchestrator: wires engine, effects, mask, UI
-js/effectEngine.js  → Render pipeline: source → effects chain → mask composite → output
-js/maskManager.js   → Selection system (rect/brush) with overlay canvas
-js/imageLoader.js   → Drag-and-drop + file input handling
-js/clipboard.js     → Copy as PNG (ClipboardItem) / SVG (text)
-js/effects/*.js     → 7 effect modules (pluggable, uniform interface)
-js/utils/rng.js     → Seeded PRNG (Lehmer/Park-Miller)
-css/style.css       → All styles, CRT/cyberpunk theme with CSS custom properties
+index.html              → Entry point (Vite processes this)
+src/app.ts              → Orchestrator: wires engine, effects, mask, UI
+src/effectEngine.ts     → Render pipeline: source → effects chain → mask composite → output
+src/maskManager.ts      → Selection system (rect/brush) with overlay canvas
+src/imageLoader.ts      → Drag-and-drop + file input handling
+src/clipboard.ts        → Copy as PNG (ClipboardItem) / SVG (text)
+src/types.ts            → Shared TypeScript interfaces (EffectParam, EffectModule, EffectState)
+src/effects/*.ts        → 7 effect modules (pluggable, uniform interface)
+src/utils/rng.ts        → Seeded PRNG (Lehmer/Park-Miller)
+css/style.css           → All styles, CRT/cyberpunk theme with CSS custom properties
 ```
 
 ### Effect Plugin Interface
 
 Every effect module exports a single object:
 
-```js
+```ts
+import type { EffectModule } from "../types";
+
 export default {
   id: "effectId",
   name: "Display Name",
@@ -49,10 +51,10 @@ export default {
     // Process imageData.data (Uint8ClampedArray) in place or return new ImageData
     return imageData;
   },
-};
+} satisfies EffectModule;
 ```
 
-To add an effect: create `js/effects/newEffect.js`, import and `engine.registerEffect()` in `app.js`. No other files need changes — the UI controls are generated dynamically from `params`.
+To add an effect: create `src/effects/newEffect.ts`, import and `engine.registerEffect()` in `app.ts`. No other files need changes — the UI controls are generated dynamically from `params`.
 
 ### Rendering Pipeline
 
@@ -78,4 +80,4 @@ To add an effect: create `js/effects/newEffect.js`, import and `engine.registerE
 
 ### Image Constraints
 
-Images are capped at 2048px max dimension on load (both in `imageLoader.js` and the change-image handler in `app.js`).
+Images are capped at 2048px max dimension on load (both in `imageLoader.ts` and the change-image handler in `app.ts`).

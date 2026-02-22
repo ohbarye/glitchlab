@@ -1,6 +1,6 @@
-export async function copyAsPng(canvas) {
+export async function copyAsPng(canvas: HTMLCanvasElement): Promise<void> {
   try {
-    const blob = await new Promise((resolve, reject) => {
+    const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((b) => {
         if (b) resolve(b);
         else reject(new Error("Failed to create PNG blob"));
@@ -16,7 +16,7 @@ export async function copyAsPng(canvas) {
   }
 }
 
-export async function copyAsSvg(canvas) {
+export async function copyAsSvg(canvas: HTMLCanvasElement): Promise<void> {
   try {
     const dataUrl = canvas.toDataURL("image/png");
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${canvas.width}" height="${canvas.height}">
@@ -30,7 +30,7 @@ export async function copyAsSvg(canvas) {
   }
 }
 
-function showCopyFeedback(message, isError = false) {
+function showCopyFeedback(message: string, isError = false): void {
   const toast = document.createElement("div");
   toast.className = `copy-toast ${isError ? "copy-toast-error" : ""}`;
   toast.textContent = message;

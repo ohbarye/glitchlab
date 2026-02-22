@@ -1,6 +1,16 @@
 const MAX_DIMENSION = 2048;
 
-export function initImageLoader(dropZone, fileInput, onImageLoaded) {
+type ImageLoadedCallback = (
+  img: HTMLImageElement,
+  width: number,
+  height: number,
+) => void;
+
+export function initImageLoader(
+  dropZone: HTMLElement,
+  fileInput: HTMLInputElement,
+  onImageLoaded: ImageLoadedCallback,
+): void {
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
     dropZone.classList.add("dragover");
@@ -13,21 +23,21 @@ export function initImageLoader(dropZone, fileInput, onImageLoaded) {
   dropZone.addEventListener("drop", (e) => {
     e.preventDefault();
     dropZone.classList.remove("dragover");
-    const file = e.dataTransfer.files[0];
+    const file = e.dataTransfer?.files[0];
     if (file && file.type.startsWith("image/")) {
       loadImage(file, onImageLoaded);
     }
   });
 
-  fileInput.addEventListener("change", (e) => {
-    const file = e.target.files[0];
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
     if (file) {
       loadImage(file, onImageLoaded);
     }
   });
 }
 
-function loadImage(file, callback) {
+function loadImage(file: File, callback: ImageLoadedCallback): void {
   const reader = new FileReader();
   reader.onload = (e) => {
     const img = new Image();
@@ -40,7 +50,7 @@ function loadImage(file, callback) {
       }
       callback(img, width, height);
     };
-    img.src = e.target.result;
+    img.src = e.target?.result as string;
   };
   reader.readAsDataURL(file);
 }

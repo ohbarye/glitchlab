@@ -1,4 +1,5 @@
-import { seedRng } from "../utils/rng.js";
+import type { EffectModule } from "../types";
+import { seedRng } from "../utils/rng";
 
 export default {
   name: "Corruption",
@@ -12,7 +13,10 @@ export default {
   apply(imageData, params) {
     const { data } = imageData;
     const src = new Uint8ClampedArray(data);
-    const { chunkCount, chunkSize, mode, seed } = params;
+    const chunkCount = params.chunkCount as number;
+    const chunkSize = params.chunkSize as number;
+    const mode = params.mode as string;
+    const seed = params.seed as number;
     const len = data.length;
     const rng = seedRng(seed);
 
@@ -44,4 +48,4 @@ export default {
     }
     return imageData;
   },
-};
+} satisfies EffectModule;

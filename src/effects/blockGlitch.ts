@@ -1,4 +1,5 @@
-import { seedRng } from "../utils/rng.js";
+import type { EffectModule } from "../types";
+import { seedRng } from "../utils/rng";
 
 export default {
   name: "Block Glitch",
@@ -13,7 +14,11 @@ export default {
   apply(imageData, params) {
     const { width, height, data } = imageData;
     const src = new Uint8ClampedArray(data);
-    const { count, maxWidth, maxHeight, displacement, seed } = params;
+    const count = params.count as number;
+    const maxWidth = params.maxWidth as number;
+    const maxHeight = params.maxHeight as number;
+    const displacement = params.displacement as number;
+    const seed = params.seed as number;
     const rng = seedRng(seed);
 
     for (let i = 0; i < count; i++) {
@@ -41,4 +46,4 @@ export default {
     }
     return imageData;
   },
-};
+} satisfies EffectModule;

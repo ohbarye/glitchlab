@@ -1,3 +1,9 @@
+import type { EffectModule } from "../types";
+
+function clamp(val: number, min: number, max: number): number {
+  return val < min ? min : val > max ? max : val;
+}
+
 export default {
   name: "RGB Shift",
   id: "rgbShift",
@@ -10,7 +16,10 @@ export default {
   apply(imageData, params) {
     const { width, height, data } = imageData;
     const src = new Uint8ClampedArray(data);
-    const { redX, redY, blueX, blueY } = params;
+    const redX = params.redX as number;
+    const redY = params.redY as number;
+    const blueX = params.blueX as number;
+    const blueY = params.blueY as number;
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
@@ -29,8 +38,4 @@ export default {
     }
     return imageData;
   },
-};
-
-function clamp(val, min, max) {
-  return val < min ? min : val > max ? max : val;
-}
+} satisfies EffectModule;
