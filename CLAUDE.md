@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-GLITCHLAB — a static web app for applying glitch effects to images. TypeScript + Vite, deployed to Cloudflare Pages.
+GLITCHLAB — a static web app for applying glitch effects to images. TypeScript + Vite, deployed to Cloudflare Workers.
 
 ## Development
 
@@ -14,7 +14,7 @@ npm run dev          # Vite dev server with HMR
 npm run build        # tsc -b && vite build → dist/
 npm run lint         # ESLint
 npm run preview      # Preview production build
-npm run deploy       # Build + deploy to Cloudflare Pages
+npm run deploy       # Build + deploy to Cloudflare Workers
 ```
 
 ## Architecture
