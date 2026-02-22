@@ -586,6 +586,17 @@ input[type="range"]::-moz-range-thumb {
   color: var(--bg-primary);
 }
 
+.btn-export-gif {
+  background: transparent;
+  color: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+.btn-export-gif:not(:disabled):hover {
+  background: var(--accent-cyan);
+  color: var(--bg-primary);
+}
+
 /* Copy Toast */
 .copy-toast {
   position: fixed;

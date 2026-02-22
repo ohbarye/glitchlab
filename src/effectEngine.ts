@@ -56,9 +56,22 @@ export class EffectEngine {
     this._frameRequest = requestAnimationFrame(() => this._doRender());
   }
 
-  private _doRender(): void {
+  renderToImageData(): ImageData | null {
     const { width, height } = this.sourceCanvas;
-    if (width === 0 || height === 0) return;
+    if (width === 0 || height === 0) return null;
+    return this._computeFrame();
+  }
+
+  private _doRender(): void {
+    const frame = this._computeFrame();
+    if (frame) {
+      this.outputCtx.putImageData(frame, 0, 0);
+    }
+  }
+
+  private _computeFrame(): ImageData | null {
+    const { width, height } = this.sourceCanvas;
+    if (width === 0 || height === 0) return null;
 
     try {
       const useMask = this.maskManager && this.maskManager.isMaskActive();
@@ -88,9 +101,10 @@ export class EffectEngine {
         }
       }
 
-      this.outputCtx.putImageData(imageData, 0, 0);
+      return imageData;
     } catch (err) {
       console.error("Effect rendering failed:", err);
+      return null;
     }
   }
 

@@ -1,6 +1,7 @@
 import { initImageLoader } from "./imageLoader";
 import { EffectEngine } from "./effectEngine";
 import { copyAsPng, copyAsSvg } from "./clipboard";
+import { exportGif } from "./gifExport";
 import { MaskManager } from "./maskManager";
 import type { EffectParam, EffectState, MaskMode } from "./types";
 import rgbShift from "./effects/rgbShift";
@@ -21,6 +22,7 @@ const randomizeBtn = document.getElementById("randomizeBtn") as HTMLButtonElemen
 const resetBtn = document.getElementById("resetBtn") as HTMLButtonElement;
 const copyPngBtn = document.getElementById("copyPngBtn") as HTMLButtonElement;
 const copySvgBtn = document.getElementById("copySvgBtn") as HTMLButtonElement;
+const exportGifBtn = document.getElementById("exportGifBtn") as HTMLButtonElement;
 const changeImageBtn = document.getElementById("changeImageBtn") as HTMLButtonElement;
 const fileInputAlt = document.getElementById("fileInputAlt") as HTMLInputElement;
 const imageModal = document.getElementById("imageModal") as HTMLElement;
@@ -70,6 +72,7 @@ function loadImageToCanvas(img: HTMLImageElement, width: number, height: number)
   resetBtn.disabled = false;
   copyPngBtn.disabled = false;
   copySvgBtn.disabled = false;
+  exportGifBtn.disabled = false;
 
   engine.render();
 }
@@ -91,6 +94,27 @@ resetBtn.addEventListener("click", () => {
 
 copyPngBtn.addEventListener("click", () => copyAsPng(outputCanvas));
 copySvgBtn.addEventListener("click", () => copyAsSvg(outputCanvas));
+
+exportGifBtn.addEventListener("click", async () => {
+  exportGifBtn.disabled = true;
+  const originalText = exportGifBtn.textContent;
+  exportGifBtn.textContent = "GENERATING...";
+  try {
+    const blob = await exportGif(engine, (current, total) => {
+      exportGifBtn.textContent = `FRAME ${current}/${total}`;
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "glitch.gif";
+    a.click();
+    URL.revokeObjectURL(url);
+  } finally {
+    exportGifBtn.textContent = originalText;
+    exportGifBtn.disabled = false;
+    syncControlsFromEngine();
+  }
+});
 
 // Change image
 changeImageBtn.addEventListener("click", () => fileInputAlt.click());
