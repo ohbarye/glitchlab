@@ -638,6 +638,50 @@ input[type="range"]::-moz-range-thumb {
   object-fit: contain;
 }
 
+/* Footer */
+.site-footer {
+  text-align: center;
+  padding: 24px 16px;
+  margin-top: 16px;
+}
+
+.privacy-note {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.footer-author {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.footer-author a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+.footer-author a:hover {
+  text-decoration: underline;
+}
+
+.footer-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: color 0.2s;
+}
+
+.footer-icon:hover {
+  color: var(--accent-cyan);
+  text-decoration: none !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .workspace {

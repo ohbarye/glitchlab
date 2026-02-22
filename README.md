@@ -4,6 +4,8 @@ Image glitch effect processor. Apply digital distortion effects to any image —
 
 **Live demo**: https://glitchlab-aqn.pages.dev/
 
+![Demo](docs/demo.gif)
+
 ## Features
 
 - **7 glitch effects**: RGB Shift, Scan Lines, Channel Split, Block Glitch, Wave Distort, Corruption, Pixel Sort
@@ -12,6 +14,19 @@ Image glitch effect processor. Apply digital distortion effects to any image —
 - **Randomize**: Generate random effect combinations with one click
 - **Copy output**: Copy as PNG (image) or SVG (text) to clipboard
 - **Zoom**: Click the image to view full size in a modal
+- **Privacy**: All processing happens in your browser. No images are uploaded or stored externally.
+
+### Effects
+
+| ![Effects applied](docs/screenshot-effects.png) | ![Partial mask](docs/screenshot-mask.png) |
+|:---:|:---:|
+| Multiple effects applied | Partial mask — effects only in selected region |
+
+### Zoom
+
+| ![Zoom modal](docs/screenshot-zoom.png) |
+|:---:|
+| Click the image to view full size |
 
 ## Usage
 
